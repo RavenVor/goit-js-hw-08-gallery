@@ -24,5 +24,5 @@ function createElement(element) {
 }
 
 const gallerySourseArr = gallerySourseFiles.map((item) => createElement(item));
-console.log(gallerySourseArr);
+
 galleryListRef.append(...gallerySourseArr);
