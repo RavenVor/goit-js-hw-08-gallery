@@ -77,13 +77,13 @@ function onKeyDown(event) {
   }
 
   if (event.code === 'ArrowRight') {
-    let prevIndex = Number(event.target.firstElementChild.dataset.index);
-    let nextIndex = +event.target.firstChild.dataset.index + 1;
+    const indexOfSmallImg = event.target.firstChild.dataset.index;
+    const prevIndex = Number(indexOfSmallImg);
+    const nextIndex = prevIndex + 1;
 
     if (nextIndex === gallerySourseFiles.length) {
       return;
     }
-    prevIndex += 1;
     ref.modalImage.src = gallerySourseFiles[nextIndex].original;
   }
 }
