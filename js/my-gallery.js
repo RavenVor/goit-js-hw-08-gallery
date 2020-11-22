@@ -1,5 +1,8 @@
 import gallerySourseFiles from './gallery-items.js';
 
+const maxIndex = gallerySourseFiles.length - 1;
+let prevIndex;
+
 // створення галереї
 
 function createElement(element) {
@@ -13,14 +16,12 @@ function createElement(element) {
   const galleryImageRef = document.createElement('img');
   galleryImageRef.classList.add('gallery__image');
   galleryImageRef.src = element.preview;
-  // galleryImageRef.setAttribute('data-source', element.original);
   galleryImageRef.dataset.source = element.original;
-  galleryImageRef.dataset.index = element.index;
+  galleryImageRef.dataset.index = gallerySourseFiles.indexOf(element);
   galleryImageRef.alt = element.description;
 
   galleryLinkRef.appendChild(galleryImageRef);
   galleryItemRef.appendChild(galleryLinkRef);
-
   return galleryItemRef;
 }
 
@@ -31,6 +32,7 @@ galleryListRef.append(...gallerySourseArr);
 
 const ref = {
   backDrop: document.querySelector('.js-lightbox'),
+  overley: document.querySelector('.lightbox__overlay'),
   modalImage: document.querySelector('.lightbox__image'),
   closeBtn: document.querySelector('button[data-action="close-lightbox"]'),
 };
@@ -38,6 +40,7 @@ const ref = {
 // підключення великого зображення
 
 galleryListRef.addEventListener('click', onGalleryClick);
+ref.overley.addEventListener('click', onOverleyClick);
 ref.closeBtn.addEventListener('click', hideModal);
 
 function onGalleryClick(event) {
@@ -45,6 +48,7 @@ function onGalleryClick(event) {
 
   const target = event.target;
   const currentTarget = event.currentTarget;
+  const indexOfSmallImg = target.dataset.index;
 
   if (target === currentTarget) {
     return;
@@ -52,6 +56,7 @@ function onGalleryClick(event) {
 
   ref.modalImage.src = target.dataset.source;
   ref.modalImage.alt = target.getAttribute('alt');
+  prevIndex = Number(indexOfSmallImg);
 
   openModal();
 }
@@ -69,6 +74,22 @@ function hideModal() {
   window.removeEventListener('keydown', onKeyDown);
 }
 
+function onOverleyClick(event) {
+  const target = event.target;
+  const currentTarget = event.currentTarget;
+  if (target === currentTarget) {
+    hideModal();
+  }
+}
+
+function showNextIndex(nextIndex) {
+  if (nextIndex === gallerySourseFiles.length) {
+    return;
+  }
+
+  ref.modalImage.src = gallerySourseFiles[nextIndex].original;
+}
+
 // дії, при натисненні кнопок
 
 function onKeyDown(event) {
@@ -76,14 +97,18 @@ function onKeyDown(event) {
     hideModal();
   }
 
+  let nextIndex;
   if (event.code === 'ArrowRight') {
-    const indexOfSmallImg = event.target.firstChild.dataset.index;
-    const prevIndex = Number(indexOfSmallImg);
-    const nextIndex = prevIndex + 1;
+    prevIndex + 1 > maxIndex ? (nextIndex = 0) : (nextIndex = prevIndex + 1);
 
-    if (nextIndex === gallerySourseFiles.length) {
-      return;
-    }
-    ref.modalImage.src = gallerySourseFiles[nextIndex].original;
+    prevIndex = nextIndex;
+    showNextIndex(nextIndex);
+  }
+
+  if (event.code === 'ArrowLeft') {
+    prevIndex - 1 < 0 ? (nextIndex = maxIndex) : (nextIndex = prevIndex - 1);
+
+    prevIndex = nextIndex;
+    showNextIndex(nextIndex);
   }
 }
